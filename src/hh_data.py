@@ -85,6 +85,7 @@ def filtered_hh_data(all_vacancies: list[dict[str, Any]]) -> list[dict[str, Any]
         vacancies.append(
             {
                 "name": vacancy["name"],
+                "id": vacancy["id"],
                 "salary": salary_info,  # vacancy["salary"],
                 "description": responsibility or "Обязанности не указаны",
                 "url": vacancy.get("alternate_url", "Нет ссылки"),  # Проверяем наличие "alternate_url"
