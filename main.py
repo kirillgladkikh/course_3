@@ -21,7 +21,7 @@ def main():
 
     # data = get_hh_data(employers_ids)
     create_database('course3', params)
-    # save_data_to_database(data, 'course3', params)
+    save_data_to_database(data, 'course3', params)
 
 
 if __name__ == '__main__':
