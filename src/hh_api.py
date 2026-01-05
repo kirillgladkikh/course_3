@@ -129,12 +129,24 @@ class HHApi(AbstractAPI):
                         "currency": salary.get("currency"),
                     }
 
+            # 3. Проверка поля "employer"
+            if "employer" in vacancy:
+                employer = vacancy["employer"]
+
+                # Сценарий 2: employer — словарь (корректный формат)
+                if isinstance(employer, dict):
+                    employer_info = {
+                        "id": employer.get("id"),
+                        "name": employer.get("name"),
+                    }
+
             vacancies.append(
                 {
                     "name": vacancy["name"],
                     "salary": salary_info,  # vacancy["salary"],
                     "description": responsibility or "Обязанности не указаны",
                     "url": vacancy.get("alternate_url", "Нет ссылки"),  # Проверяем наличие "alternate_url"
+                    "employer": employer_info,
                 }
             )
         return vacancies
