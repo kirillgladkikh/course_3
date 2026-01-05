@@ -25,7 +25,7 @@ def create_database(database_name: str, params: dict) -> None:
             CREATE TABLE employers (
                 employer_id SERIAL PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
-                id INTEGER
+                id VARCHAR(50) NOT NULL
             )
         """)
 
@@ -36,6 +36,7 @@ def create_database(database_name: str, params: dict) -> None:
                 employer_id INTEGER,
                 FOREIGN KEY (employer_id) REFERENCES employers(employer_id),
                 name VARCHAR(255) NOT NULL,
+                id VARCHAR(50) NOT NULL,
                 salary_from VARCHAR(10) NOT NULL,
                 salary_to VARCHAR(10) NOT NULL,
                 currency VARCHAR(3) NOT NULL,
@@ -59,7 +60,7 @@ def save_data_to_database(data: list[dict[str, Any]], database_name: str, params
             # employer_stats = channel['employer']['statistics']
             cur.execute(
                 """
-                INSERT INTO channels (title, views, subscribers, videos, channel_url)
+                INSERT INTO employers (title, views, subscribers, videos, channel_url)
                 VALUES (%s, %s, %s, %s, %s)
                 RETURNING channel_id
                 """,
