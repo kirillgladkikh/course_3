@@ -7,54 +7,13 @@ from abc import ABC, abstractmethod
 # https://api.hh.ru/openapi/redoc#tag/Poisk-vakansij/operation/get-vacancies
 
 class AbstractAPI(ABC):
-    """
-    Абстрактный базовый класс для API‑взаимодействия с сервисами вакансий.
-
-    Определяет контракт для реализации конкретных API‑клиентов (например, для hh.ru).
-    Все наследники обязаны реализовать методы подключения и получения вакансий.
-
-    Методы:
-        _connect(keyword, per_page):
-            Устанавливает соединение/формирует запрос к API с заданными параметрами.
-            Должен быть реализован в дочерних классах.
-
-        hh_api_get_vacancies(keyword: str, per_page: int = 20) -> list:
-            Получает список вакансий по ключевому слову с указанием количества результатов на страницу.
-            Должен быть реализован в дочерних классах.
-    """
 
     @abstractmethod
     def _connect(self, keyword, per_page):
-        """
-        Абстрактный метод для установления соединения или формирования базового запроса к API.
-
-        Args:
-            keyword (str): Ключевое слово для поиска вакансий.
-            per_page (int): Количество вакансий, возвращаемых за один запрос (на страницу)
-
-        Raises:
-            NotImplementedError: Если метод не переопределён в классе‑наследнике
-        """
         pass
 
     @abstractmethod
-    def hh_api_get_vacancies(self, keyword: str, per_page: int = 20) -> list:
-        """
-        Абстрактный метод для получения списка вакансий из API по ключевому слову.
-
-        Args:
-            keyword (str): Ключевое слово для поиска вакансий (например, «Python разработчик»)
-            per_page (int, optional): Количество вакансий в ответе (по умолчанию 20)
-
-        Returns:
-            list: Список вакансий в формате, определённом реализацией API.
-                    Каждый элемент — словарь с данными о вакансии.
-
-        Raises:
-            NotImplementedError: Если метод не переопределён в классе‑наследнике
-            Exception: Может выбрасывать исключения, связанные с сетью, авторизацией или форматом ответа
-                        (конкретика зависит от реализации)
-        """
+    def hh_api_get_vacancies(self, keyword: str, per_page: int = 100) -> list:
         pass
 
 
@@ -100,7 +59,7 @@ class HHApi(AbstractAPI):
         response.raise_for_status()
         return response.json()
 
-    def hh_api_get_vacancies(self, keyword: str, per_page: int = 20) -> list:
+    def hh_api_get_vacancies(self, keyword: str = "python", per_page: int = 100) -> list:
         """
         Получает список вакансий по ключевому слову с API hh.ru.
 
