@@ -3,6 +3,9 @@ import pprint
 from abc import ABC, abstractmethod
 
 
+# ПУТЬ ДО ДОКУМЕНТАЦИИ К API (ПОИСК ВАКАНСИЙ)
+# https://api.hh.ru/openapi/redoc#tag/Poisk-vakansij/operation/get-vacancies
+
 class AbstractAPI(ABC):
     """
     Абстрактный базовый класс для API‑взаимодействия с сервисами вакансий.
@@ -113,7 +116,7 @@ class HHApi(AbstractAPI):
                    каждый словарь содержит поля: name, salary, description, url
         """
         response = self._connect(keyword, per_page)
-        # print(f'\nresponse["items"]: {response["items"]}')
+        print(f'\nresponse["items"]: {response["items"]}')
         return self.filter_vacancies(response["items"])
 
     @staticmethod
