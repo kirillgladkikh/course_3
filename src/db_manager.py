@@ -164,8 +164,6 @@ class DBManager:
         ]
 
 
-
-
     def _format_companies(self, data: list[dict[str, Any]]) -> str:
         if not data:
             return "▸ Компании: не найдены."
@@ -188,7 +186,8 @@ class DBManager:
         return "\n".join(lines)
 
     def _format_avg_salary(self, value: float) -> str:
-        return f"▸ Средняя зарплата по вакансиям: {value:.2f} {self._detect_common_currency() or 'RUB'}"
+        return f"▸ Средняя зарплата по вакансиям: {value:.2f} RUB"
+        # return f"▸ Средняя зарплата по вакансиям: {value:.2f} {self._detect_common_currency() or 'RUB'}"
 
 
     def _format_high_salary_vacancies(self, data: list[dict[str, Any]]) -> str:
