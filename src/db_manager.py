@@ -1,5 +1,5 @@
 import psycopg2
-from typing import List, Dict, Optional, Any
+from typing import Optional, Any
 
 
 class DBManager:
@@ -36,19 +36,18 @@ class DBManager:
             self.connect()
 
         with self.conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT e.name AS company_name, COUNT(v.vacancy_id) AS vacancies_count
                 FROM employers e
                 LEFT JOIN vacancies v ON e.employer_id = v.employer_id
                 GROUP BY e.employer_id, e.name
                 ORDER BY vacancies_count DESC;
-            """)
+            """
+            )
             rows = cur.fetchall()
 
-        return [
-            {"company_name": row[0], "vacancies_count": row[1]}
-            for row in rows
-        ]
+        return [{"company_name": row[0], "vacancies_count": row[1]} for row in rows]
 
     def get_all_vacancies(self) -> list[dict[str, Any]]:
         """
@@ -61,11 +60,13 @@ class DBManager:
             self.connect()
 
         with self.conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT e.name, v.name, v.salary_from, v.salary_to, v.currency, v.url
                 FROM vacancies v
                 JOIN employers e ON v.employer_id = e.employer_id;
-            """)
+            """
+            )
             rows = cur.fetchall()
 
         return [
@@ -75,7 +76,7 @@ class DBManager:
                 "salary_from": row[2],
                 "salary_to": row[3],
                 "currency": row[4],
-                "url": row[5]
+                "url": row[5],
             }
             for row in rows
         ]
@@ -90,10 +91,12 @@ class DBManager:
             self.connect()
 
         with self.conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT AVG((NULLIF(salary_from, '0')::numeric + NULLIF(salary_to, '0')::numeric) / 2)
                 FROM vacancies;
-            """)
+            """
+            )
             result = cur.fetchone()[0]
 
         return float(result) if result is not None else 0.0
@@ -109,12 +112,15 @@ class DBManager:
             self.connect()
 
         with self.conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT e.name, v.name, v.salary_from, v.salary_to, v.currency, v.url
                 FROM vacancies v
                 JOIN employers e ON v.employer_id = e.employer_id
                 WHERE ((NULLIF(v.salary_from, '0')::numeric + NULLIF(v.salary_to, '0')::numeric) / 2) > %s;
-            """, (avg_salary,))
+            """,
+                (avg_salary,),
+            )
             rows = cur.fetchall()
 
         return [
@@ -124,7 +130,7 @@ class DBManager:
                 "salary_from": row[2],
                 "salary_to": row[3],
                 "currency": row[4],
-                "url": row[5]
+                "url": row[5],
             }
             for row in rows
         ]
@@ -143,12 +149,15 @@ class DBManager:
         search_pattern = f"%{keyword}%"
 
         with self.conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT e.name, v.name, v.salary_from, v.salary_to, v.currency, v.url
                 FROM vacancies v
                 JOIN employers e ON v.employer_id = e.employer_id
                 WHERE v.name ILIKE %s;
-            """, (search_pattern,))
+            """,
+                (search_pattern,),
+            )
             rows = cur.fetchall()
 
         return [
@@ -158,11 +167,10 @@ class DBManager:
                 "salary_from": row[2],
                 "salary_to": row[3],
                 "currency": row[4],
-                "url": row[5]
+                "url": row[5],
             }
             for row in rows
         ]
-
 
     def _format_companies(self, data: list[dict[str, Any]]) -> str:
         if not data:
@@ -189,13 +197,12 @@ class DBManager:
         return f"▸ Средняя зарплата по вакансиям: {value:.2f} RUB"
         # return f"▸ Средняя зарплата по вакансиям: {value:.2f} {self._detect_common_currency() or 'RUB'}"
 
-
     def _format_high_salary_vacancies(self, data: list[dict[str, Any]]) -> str:
         if not data:
             return "▸ Вакансии с зарплатой выше средней: не найдены."
         lines = ["▸ Вакансии с зарплатой выше средней:"]
         for item in data:
-            avg = (float(item['salary_from']) + float(item['salary_to'])) / 2
+            avg = (float(item["salary_from"]) + float(item["salary_to"])) / 2
             lines.append(
                 f"  • Компания: {item['company_name']}\n"
                 f"    Название: {item['vacancy_name']}\n"
@@ -203,7 +210,6 @@ class DBManager:
                 f"    Ссылка: {item['url']}"
             )
         return "\n".join(lines)
-
 
     def _format_keyword_vacancies(self, keyword: str, data: list[dict[str, Any]]) -> str:
         if not data:
@@ -227,7 +233,6 @@ class DBManager:
             result = cur.fetchone()
         return result[0] if result else None
 
-
     def __str__(self) -> str:
         """
         Возвращает полный отформатированный отчёт по данным БД.
@@ -245,14 +250,17 @@ class DBManager:
             # Для примера возьмём ключевое слово 'python'
             keyword_vacancies = self.get_vacancies_with_keyword("python")
 
-
             # Формируем отчёт
             report = (
                 "= ОТЧЁТ ПО БАЗЕ ДАННЫХ =\n\n"
-                + self._format_companies(companies) + "\n\n"
-                + self._format_vacancies(all_vacancies) + "\n\n"
-                + self._format_avg_salary(avg_salary) + "\n\n"
-                + self._format_high_salary_vacancies(high_salary_vacancies) + "\n\n"
+                + self._format_companies(companies)
+                + "\n\n"
+                + self._format_vacancies(all_vacancies)
+                + "\n\n"
+                + self._format_avg_salary(avg_salary)
+                + "\n\n"
+                + self._format_high_salary_vacancies(high_salary_vacancies)
+                + "\n\n"
                 + self._format_keyword_vacancies("python", keyword_vacancies)
             )
             return report

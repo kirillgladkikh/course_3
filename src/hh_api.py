@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 # ПУТЬ ДО ДОКУМЕНТАЦИИ К API (ПОИСК ВАКАНСИЙ)
 # https://api.hh.ru/openapi/redoc#tag/Poisk-vakansij/operation/get-vacancies
 
+
 class AbstractAPI(ABC):
 
     @abstractmethod
