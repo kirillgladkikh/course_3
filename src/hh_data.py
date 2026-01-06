@@ -22,20 +22,20 @@ from typing import Any
 #     '1057',  # Лаборатория Касперского
 # ]
 
-employers = [
-    {"id": "1721725", "name": "Rocket10"},
-    {"id": "1579449", "name": "idaproject"},
-    # {"id": "1740", "name": "Яндекс"},
-    # {"id": "67611", "name": "Тензор"},
-    # {"id": "4614421", "name": "RedLab"},
-    # {"id": "727029", "name": "PravoTech"},
-    # {"id": "2300703", "name": "Открытая мобильная платформа"},
-    # {"id": "819979", "name": "SkillStaff"},
-    # {"id": "1993194", "name": "YADRO"},
-    # {"id": "894410", "name": "РТЛабс"},
-    # {"id": "1473866", "name": "ООО Сбербанк-Сервис"},
-    # {"id": "1057", "name": "Лаборатория Касперского"}
-]
+# employers = [
+#     {"id": "1721725", "name": "Rocket10"},
+#     {"id": "1579449", "name": "idaproject"},
+#     # {"id": "1740", "name": "Яндекс"},
+#     # {"id": "67611", "name": "Тензор"},
+#     # {"id": "4614421", "name": "RedLab"},
+#     # {"id": "727029", "name": "PravoTech"},
+#     # {"id": "2300703", "name": "Открытая мобильная платформа"},
+#     # {"id": "819979", "name": "SkillStaff"},
+#     # {"id": "1993194", "name": "YADRO"},
+#     # {"id": "894410", "name": "РТЛабс"},
+#     # {"id": "1473866", "name": "ООО Сбербанк-Сервис"},
+#     # {"id": "1057", "name": "Лаборатория Касперского"}
+# ]
 
 
 def get_hh_data(employers: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -92,18 +92,35 @@ def filtered_hh_data(all_vacancies: list[dict[str, Any]]) -> list[dict[str, Any]
 
             # Сценарий 2: salary — словарь (корректный формат)
             if isinstance(salary, dict):
+
+                # Явная проверка на None для from/to
+                salary_from = salary.get("from")
+                salary_to = salary.get("to")
+
                 salary_info = {
-                    "from": salary.get("from"),
-                    "to": salary.get("to"),
+                    "from": str(salary_from) if salary_from is not None else "0",
+                    "to": str(salary_to) if salary_to is not None else "0",
                     "currency": salary.get("currency"),
                 }
-            # Сценарий 3: salary ОТСУТСТВУЕТ в вакансии
             else:
                 salary_info = {
                     "from": "0",
                     "to": "0",
                     "currency": "None"
                 }
+
+                # salary_info = {
+                #     "from": salary.get("from"),
+                #     "to": salary.get("to"),
+                #     "currency": salary.get("currency"),
+                # }
+            # Сценарий 3: salary ОТСУТСТВУЕТ в вакансии
+        else:
+            salary_info = {
+                "from": "0",
+                "to": "0",
+                "currency": "None"
+            }
 
         # 3. Проверка поля "employer"
         employer_info = None
