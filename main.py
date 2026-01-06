@@ -2,6 +2,7 @@
 from config import config
 from src.hh_data import get_hh_data, filtered_hh_data, get_emp_vac_dict
 from src.db_create import create_database, save_data_to_database
+from src.db_manager import DBManager
 
 
 def main():
@@ -36,20 +37,37 @@ def main():
 
     params = config()
 
-    # ФОРМИРУЕМ ДАННЫЕ ДЛЯ ЗАГРУЗКИ В БД
+    # # ФОРМИРУЕМ ДАННЫЕ ДЛЯ ЗАГРУЗКИ В БД
+    #
+    # # Получаем все вакансии для выбранных работодателей по API
+    # data = get_hh_data(employers)
+    # # Оставляем (фильтруем) только нужные данные по вакансиям для загрузки в БД
+    # filtered_data = filtered_hh_data(data)
+    # # Формируем словарь данных с работодателями и их вакансиями для загрузки в БД
+    # emp_vac_dict = get_emp_vac_dict(employers, filtered_data)
+    #
+    # # СОЗДАЕМ БД И ТАБЛИЦЫ employers и vacancies
+    # create_database('course3', params)
+    #
+    # # СОХРАНЯЕМ ДАННЫЕ В БД
+    # save_data_to_database(emp_vac_dict, 'course3', params)
 
-    # Получаем все вакансии для выбранных работодателей по API
-    data = get_hh_data(employers)
-    # Оставляем (фильтруем) только нужные данные по вакансиям для загрузки в БД
-    filtered_data = filtered_hh_data(data)
-    # Формируем словарь данных с работодателями и их вакансиями для загрузки в БД
-    emp_vac_dict = get_emp_vac_dict(employers, filtered_data)
+    # ВЗАИМОДЕЙСТВИЕ С БД
 
-    # СОЗДАЕМ БД И ТАБЛИЦЫ employers и vacancies
-    create_database('course3', params)
+    # Создаём менеджер БД
+    db_manager = DBManager("course3", params)
 
-    # СОХРАНЯЕМ ДАННЫЕ В БД
-    save_data_to_database(emp_vac_dict, 'course3', params)
+    # # Примеры вызовов
+    # companies = db_manager.get_companies_and_vacancies_count()
+    # all_vacancies = db_manager.get_all_vacancies()
+    # avg_salary = db_manager.get_avg_salary()
+    # high_salary_vacancies = db_manager.get_vacancies_with_higher_salary()
+    # python_vacancies = db_manager.get_vacancies_with_keyword("python")
+
+    print(db_manager)  # Вызовет __str__ и покажет весь отчёт
+
+    # Закрыть соединение
+    db_manager.close()
 
 
 if __name__ == '__main__':
