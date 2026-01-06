@@ -38,7 +38,7 @@ employers = [
 ]
 
 
-def get_hh_data(employers: list[dict[str]]) -> list[dict[str, Any]]:
+def get_hh_data(employers: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """ """
     hh_data = []
     for employer in employers:
@@ -58,19 +58,16 @@ def get_hh_data(employers: list[dict[str]]) -> list[dict[str, Any]]:
         except Exception as e:
             print(f"Ошибка при получении данных для employer_id={emp_id} ({employer['name']}): {e}")
 
-
-    #     response = connect(emp_id)
-    #     # print(f'\nresponse["items"]: {response["items"]}')
-    #     hh_data.extend(response["items"])
-    # # print(f'\nhh_data.extend(response["items"]: {hh_data}')
     return hh_data
 
-def connect(employer_id: str = '1740'):
+
+def connect(employer_id: str):
     """ """
     url = f"https://api.hh.ru/vacancies?employer_id={employer_id}&per_page=100&page=0"
     response = requests.get(url)
     response.raise_for_status()
     return response.json()
+
 
 def filtered_hh_data(all_vacancies: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """ """
@@ -132,43 +129,27 @@ def filtered_hh_data(all_vacancies: list[dict[str, Any]]) -> list[dict[str, Any]
                 "employer": employer_info,
             }
         )
-    print(f'\nFiltered vacancies: {vacancies}')
+    # print(f'\nFiltered vacancies: {vacancies}')
     return vacancies
 
 
-# def employer_hh_data(all_vacancies: list[dict[str, Any]]) -> list[dict[str, Any]]:
-#     """ """
-#     vacancies = []
-#     for vacancy in all_vacancies:
-#         # 3. Проверка поля "employer"
-#         employer_info = None
-#
-#         # Сценарий 1: employer присутствует в вакансии
-#         if "employer" in vacancy:
-#             employer = vacancy["employer"]
-#
-#             # Сценарий 2: employer — словарь (корректный формат)
-#             if isinstance(employer, dict):
-#                 employer_info = {
-#                     "id": employer.get("id"),
-#                     "name": employer.get("name"),
-#                 }
-#
-#         vacancies.append(
-#             {
-#                 "employer": employer_info,
-#             }
-#         )
-#     print(f'\nFiltered vacancies: {vacancies}')
-#     return vacancies
-
-
-def get_emp_vac_dict(all_vacancies: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def get_emp_vac_dict(employers: list[dict[str, Any]], filtered_hh_data: list[dict[str, Any]]) -> dict[str, Any]:
     """ """
-    pass
+    result = {
+        "employers": employers,
+        "vacancies": filtered_hh_data
+    }
+    print(f'\nemp_vac_dict: {result}')
+    return result
+    # emp_vac_dict = []
+    # emp_vac_dict['employers'] = employers
+    # emp_vac_dict.append['vacancies'] = filtered_hh_data
+    #
+    # return emp_vac_dict
 
 if __name__ == '__main__':
     data = get_hh_data(employers)
     filtered_data = filtered_hh_data(data)
+    get_emp_vac_dict(employers, filtered_data)
     # response = connect()
     # print(f'\nresponse["items"]: {response["items"]}')
