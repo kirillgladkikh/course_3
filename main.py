@@ -1,24 +1,38 @@
 
 from config import config
-from src.hh_data import get_hh_data, filtered_hh_data
+from src.hh_data import get_hh_data, filtered_hh_data, get_emp_vac_dict
 from src.db_create import create_database, save_data_to_database
 
 
 def main():
     employers = [
-        {"employer_id": "1721725", "name": "Rocket10"},
-        {"employer_id": "1579449", "name": "idaproject"},
-        # {"employer_id": "1740", "name": "Яндекс"},
-        # {"employer_id": "67611", "name": "Тензор"},
-        # {"employer_id": "4614421", "name": "RedLab"},
-        # {"employer_id": "727029", "name": "PravoTech"},
-        # {"employer_id": "2300703", "name": "Открытая мобильная платформа"},
-        # {"employer_id": "819979", "name": "SkillStaff"},
-        # {"employer_id": "1993194", "name": "YADRO"},
-        # {"employer_id": "894410", "name": "РТЛабс"},
-        # {"employer_id": "1473866", "name": "ООО Сбербанк-Сервис"},
-        # {"employer_id": "1057", "name": "Лаборатория Касперского"}
+        {"id": "1721725", "name": "Rocket10"},
+        {"id": "1579449", "name": "idaproject"},
+        # {"id": "1740", "name": "Яндекс"},
+        # {"id": "67611", "name": "Тензор"},
+        # {"id": "4614421", "name": "RedLab"},
+        # {"id": "727029", "name": "PravoTech"},
+        # {"id": "2300703", "name": "Открытая мобильная платформа"},
+        # {"id": "819979", "name": "SkillStaff"},
+        # {"id": "1993194", "name": "YADRO"},
+        # {"id": "894410", "name": "РТЛабс"},
+        # {"id": "1473866", "name": "ООО Сбербанк-Сервис"},
+        # {"id": "1057", "name": "Лаборатория Касперского"}
     ]
+    # employers = [
+    #     {"employer_id": "1721725", "name": "Rocket10"},
+    #     {"employer_id": "1579449", "name": "idaproject"},
+    #     # {"employer_id": "1740", "name": "Яндекс"},
+    #     # {"employer_id": "67611", "name": "Тензор"},
+    #     # {"employer_id": "4614421", "name": "RedLab"},
+    #     # {"employer_id": "727029", "name": "PravoTech"},
+    #     # {"employer_id": "2300703", "name": "Открытая мобильная платформа"},
+    #     # {"employer_id": "819979", "name": "SkillStaff"},
+    #     # {"employer_id": "1993194", "name": "YADRO"},
+    #     # {"employer_id": "894410", "name": "РТЛабс"},
+    #     # {"employer_id": "1473866", "name": "ООО Сбербанк-Сервис"},
+    #     # {"employer_id": "1057", "name": "Лаборатория Касперского"}
+    # ]
 
     params = config()
 
@@ -32,10 +46,10 @@ def main():
     emp_vac_dict = get_emp_vac_dict(employers, filtered_data)
 
     # СОЗДАЕМ БД И ТАБЛИЦЫ employers и vacancies
-    # create_database('course3', params)
+    create_database('course3', params)
 
     # СОХРАНЯЕМ ДАННЫЕ В БД
-    # save_data_to_database(data, 'course3', params)
+    save_data_to_database(emp_vac_dict, 'course3', params)
 
 
 if __name__ == '__main__':

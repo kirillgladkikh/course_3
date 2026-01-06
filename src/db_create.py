@@ -34,7 +34,7 @@ def create_database(database_name: str, params: dict) -> None:
                 id VARCHAR(50) NOT NULL,
                 salary_from VARCHAR(10) NOT NULL,
                 salary_to VARCHAR(10) NOT NULL,
-                currency VARCHAR(3) NOT NULL,
+                currency VARCHAR(5) NOT NULL,
                 url VARCHAR(255) NOT NULL,
                 description TEXT
             )
@@ -44,44 +44,114 @@ def create_database(database_name: str, params: dict) -> None:
     conn.close()
 
 
-def save_data_to_database(data: list[dict[str, Any]], database_name: str, params: dict) -> None:
-    """ """
+def save_data_to_database(data: dict[str, Any], database_name: str, params: dict) -> None:
+    """Сохраняет данные о работодателях и вакансиях в БД."""
     conn = psycopg2.connect(dbname=database_name, **params)
 
-    with conn.cursor() as cur:
-        for employer=channel in data:
-            employer_data=channel_data = employer=channel['employers']  # СДЕЛАТЬ СТРУКТУРУ =============
-            cur.execute(
-                """
-                INSERT INTO employers=channels (name, id)
-                VALUES (%s, %s)
-                RETURNING employer_id=channel_id
-                """,
-                (employer_data['name'], employer_data['id'])
-            )
-            employer_id=channel_id = cur.fetchone()[0]
-            vacancies_data=videos_data = employer=channel['vacancies']  # СДЕЛАТЬ СТРУКТУРУ =============
-            for vacancy=video in vacancies_data=videos_data:
-                vacancy_data=video_data = vacancy=video['???snippet???']  # ??????? НАДО ЛИ ЭТО ВЛОЖЕНИЕ МНЕ ????????
+    try:
+        with conn.cursor() as cur:
+            # 1. Сохраняем работодателей
+            employers_data = data["employers"]
+            for employer in employers_data:
                 cur.execute(
                     """
-                    INSERT INTO vacancies (employer_id=channel_id, name, id, salary_from, salary_to, currency, url, description)
+                    INSERT INTO employers (name, id)
+                    VALUES (%s, %s)
+                    RETURNING employer_id
+                    """,
+                    (employer["name"], employer["id"])
+                )
+                employer_id = cur.fetchone()[0]  # Получаем ID добавленного работодателя
+
+                # 2. Сохраняем вакансии этого работодателя
+                # (если нужно связать вакансии с конкретным работодателем по ID)
+                # Но в вашем случае вакансии уже содержат employer_info → см. ниже
+
+            # 3. Сохраняем все вакансии (они уже содержат ссылку на работодателя)
+            vacancies_data = data["vacancies"]
+            for vacancy in vacancies_data:
+                # Извлекаем данные о работодателе из вакансии
+                emp_info = vacancy["employer"]
+                if emp_info:
+                    # Ищем employer_id по id работодателя
+                    cur.execute(
+                        "SELECT employer_id FROM employers WHERE id = %s",
+                        (emp_info["id"],)
+                    )
+                    result = cur.fetchone()
+                    if result:
+                        employer_id = result[0]
+                    else:
+                        # Если работодатель не найден — пропускаем или добавляем
+                        print(f"Работодатель с id={emp_info['id']} не найден в БД")
+                        continue
+                else:
+                    employer_id = None  # Вакансия без указания работодателя
+
+                cur.execute(
+                    """
+                    INSERT INTO vacancies 
+                    (employer_id, name, id, salary_from, salary_to, currency, url, description)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     """,
                     (
-                        employer_id=channel_id,  # ОСТАВИТЬ employer_id
-                        vacancy['name'],
-                        vacancy['id'],
-                        vacancy['salary']['salary_from'],
-                        vacancy['salary']['salary_to'],
-                        vacancy['salary']['currency'],
-                        vacancy['url'],
-                        vacancy['description']
+                        employer_id,
+                        vacancy["name"],
+                        vacancy["id"],
+                        vacancy["salary"]["from"],
+                        vacancy["salary"]["to"],
+                        vacancy["salary"]["currency"],
+                        vacancy["url"],
+                        vacancy["description"]
                     )
                 )
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+    except Exception as e:
+        print(f"Ошибка при сохранении данных в БД: {e}")
+        conn.rollback()
+    finally:
+        conn.close()
+
+
+# def save_data_to_database(data: dict[str, Any], database_name: str, params: dict) -> None:
+#     """ """
+#     conn = psycopg2.connect(dbname=database_name, **params)
+#
+#     with conn.cursor() as cur:
+#         for employer in data:
+#             employer_data = employer['employers']  # СДЕЛАТЬ СТРУКТУРУ =============
+#             cur.execute(
+#                 """
+#                 INSERT INTO employers=channels (name, id)
+#                 VALUES (%s, %s)
+#                 RETURNING employer_id=channel_id
+#                 """,
+#                 (employer_data['name'], employer_data['id'])
+#             )
+#             employer_id = cur.fetchone()[0]
+#             vacancies_data = employer['vacancies']  # СДЕЛАТЬ СТРУКТУРУ =============
+#             for vacancy in vacancies_data:
+#                 # vacancy_data = vacancy['???snippet???']  # ??????? НАДО ЛИ ЭТО ВЛОЖЕНИЕ МНЕ ????????
+#                 cur.execute(
+#                     """
+#                     INSERT INTO vacancies (employer_id, name, id, salary_from, salary_to, currency, url, description)
+#                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+#                     """,
+#                     (
+#                         employer_id,  # ОСТАВИТЬ employer_id
+#                         vacancy['name'],
+#                         vacancy['id'],
+#                         vacancy['salary']['salary_from'],
+#                         vacancy['salary']['salary_to'],
+#                         vacancy['salary']['currency'],
+#                         vacancy['url'],
+#                         vacancy['description']
+#                     )
+#                 )
+#
+#     conn.commit()
+#     conn.close()
 
     # with conn.cursor() as cur:
     #     for employer in data:
