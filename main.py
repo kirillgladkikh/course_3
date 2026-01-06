@@ -85,10 +85,10 @@ def main():
     emp_vac_dict = get_emp_vac_dict(employers, filtered_data)
 
     # СОЗДАЕМ БД И ТАБЛИЦЫ employers и vacancies
-    create_database('course3', params)
+    create_database("course3", params)
 
     # СОХРАНЯЕМ ДАННЫЕ В БД
-    save_data_to_database(emp_vac_dict, 'course3', params)
+    save_data_to_database(emp_vac_dict, "course3", params)
 
     # ВЗАИМОДЕЙСТВИЕ С БД
 

@@ -4,14 +4,12 @@ import psycopg2
 from src.db_create import create_database, save_data_to_database
 
 
-
 @patch("psycopg2.connect")
 def test_create_database_success(mock_connect):
     """Тест: успешное создание БД и таблиц."""
     # 1. Создаём мок-соединения
     mock_postgres_conn = MagicMock()
     mock_new_db_conn = MagicMock()
-
 
     # 2. Настраиваем connect() на возврат соединений
     mock_connect.side_effect = [mock_postgres_conn, mock_new_db_conn]
@@ -28,18 +26,12 @@ def test_create_database_success(mock_connect):
     mock_postgres_cur.__enter__.return_value = mock_postgres_cur
     mock_new_db_cur.__enter__.return_value = mock_new_db_cur
 
-
     # 6. Разрешаем выполнение команд (без ошибок)
     mock_postgres_cur.execute.side_effect = None
     mock_new_db_cur.execute.side_effect = None
 
     # 7. Вызываем функцию
-    params = {
-        "user": "testuser",
-        "password": "testpass",
-        "host": "localhost",
-        "port": 5432
-    }
+    params = {"user": "testuser", "password": "testpass", "host": "localhost", "port": 5432}
     create_database("test_db", params)
 
     # 8. Проверяем вызовы к первому соединению (postgres)
@@ -60,12 +52,6 @@ def test_create_database_success(mock_connect):
     assert mock_new_db_conn.close.called
 
 
-
-
-
-
-
-
 @patch("psycopg2.connect")
 def test_create_database_create_fails(mock_connect):
     """Тест: ошибка при CREATE DATABASE."""
@@ -75,10 +61,8 @@ def test_create_database_create_fails(mock_connect):
     mock_cur = MagicMock()
     mock_postgres_conn.cursor.return_value = mock_cur
 
-
     # Ошибка при CREATE DATABASE
     mock_cur.execute.side_effect = [None, psycopg2.Error("CREATE failed")]
-
 
     params = {"user": "test", "password": "pass", "host": "localhost", "port": 5432}
 
@@ -111,10 +95,8 @@ def test_save_data_success(mock_connect):
     mock_conn = MagicMock()
     mock_cur = MagicMock()
 
-
     mock_connect.return_value = mock_conn
     mock_conn.cursor.return_value = mock_cur
-
 
     # Настраиваем контекстный менеджер для курсора
     mock_cur.__enter__.return_value = mock_cur
@@ -142,33 +124,25 @@ def test_save_data_success(mock_connect):
     # Вызываем функцию
     save_data_to_database(data, "test_db", params)
 
-
     # Отладка: выводим все выполненные SQL-запросы
     print("\n=== ВЫПОЛНЕННЫЕ SQL-ЗАПРОСЫ ===")
     for i, call in enumerate(mock_cur.execute.call_args_list):
         print(f"Запрос {i+1}: {call.args[0]}")
 
-
     # Проверяем, что число INSERT соответствует количеству записей
     expected_insert_count = len(data["employers"]) + len(data["vacancies"])
     assert mock_cur.execute.call_count >= expected_insert_count, (
-        f"Ожидалось минимум {expected_insert_count} INSERT-запросов, "
-        f"но выполнено {mock_cur.execute.call_count}"
+        f"Ожидалось минимум {expected_insert_count} INSERT-запросов, " f"но выполнено {mock_cur.execute.call_count}"
     )
 
     # Проверяем, что commit вызван ровно один раз (после всех INSERT)
     assert mock_conn.commit.call_count == 1, "commit не был вызван или вызван несколько раз"
 
-
     # Проверяем, что rollback НЕ вызван (ошибок не было)
     assert not mock_conn.rollback.called, "rollback был вызван (не должно быть ошибок)"
 
-
     # Дополнительно: проверяем, что соединение закрыто
     assert mock_conn.close.call_count == 1, "close не был вызван"
-
-
-
 
 
 @patch("psycopg2.connect")
@@ -218,7 +192,6 @@ def test_vacancy_without_employer(mock_connect):
     assert mock_conn.close.called
 
 
-
 @patch("psycopg2.connect")
 @patch("builtins.print")
 def test_employer_not_found_in_db(mock_print, mock_connect):
@@ -255,23 +228,16 @@ def test_employer_not_found_in_db(mock_print, mock_connect):
 
     # Проверяем, что сообщение об ошибке выведено
     expected_msg = "Работодатель с id=999 не найден в БД"
-    assert any(
-        expected_msg in str(call)
-        for call in mock_print.call_args_list
-    )
+    assert any(expected_msg in str(call) for call in mock_print.call_args_list)
 
     # Проверяем, что INSERT INTO vacancies не выполнен (вакансия пропущена)
-    insert_calls = [
-        call for call in mock_cur.execute.call_args_list
-        if "INSERT INTO vacancies" in str(call[0][0])
-    ]
+    insert_calls = [call for call in mock_cur.execute.call_args_list if "INSERT INTO vacancies" in str(call[0][0])]
     assert len(insert_calls) == 0
 
     # Проверяем commit (должен быть, т.к. нет исключения)
     assert mock_conn.commit.called
     assert not mock_conn.rollback.called
     assert mock_conn.close.called
-
 
 
 @patch("psycopg2.connect")
@@ -309,4 +275,3 @@ def test_invalid_vacancy_salary_missing_from(mock_print, mock_connect):
     assert mock_conn.rollback.called
     assert mock_conn.close.called
     assert not mock_conn.commit.called  # commit не должен быть вызван
-

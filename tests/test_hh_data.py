@@ -7,12 +7,7 @@ from src.hh_data import get_hh_data, filtered_hh_data, get_emp_vac_dict
 def test_get_hh_data_success(mock_connect):
     """Тест: успешный ответ API с валидным списком вакансий."""
     # Подготавливаем mock-ответ от API
-    mock_connect.return_value = {
-        "items": [
-            {"id": "1", "name": "Dev"},
-            {"id": "2", "name": "QA"}
-        ]
-    }
+    mock_connect.return_value = {"items": [{"id": "1", "name": "Dev"}, {"id": "2", "name": "QA"}]}
 
     employers = [{"id": "1721725", "name": "Rocket10"}]
 
@@ -21,7 +16,6 @@ def test_get_hh_data_success(mock_connect):
     assert len(result) == 2
     assert result[0]["id"] == "1"
     assert result[1]["name"] == "QA"
-
 
 
 @patch("src.hh_data.connect")
@@ -42,7 +36,6 @@ def test_get_hh_data_no_items(mock_connect):
     assert len(result) == 0
 
 
-
 @patch("src.hh_data.connect")
 def test_get_hh_data_exception(mock_connect):
     """Тест: исключение при вызове connect (например, сеть упала)."""
@@ -56,21 +49,19 @@ def test_get_hh_data_exception(mock_connect):
     # Дополнительно: можно проверить, что print вызвал сообщение (через capsys)
 
 
-
 def test_get_hh_data_empty_employers():
     """Тест: пустой список работодателей."""
     result = get_hh_data([])
     assert len(result) == 0
 
 
-
 @patch("src.hh_data.connect")
 def test_get_hh_data_multiple_employers(mock_connect):
     """Тест: несколько работодателей — данные объединяются."""
     mock_connect.side_effect = [
-        {"items": [{"id": "1", "name": "Job A"}]},      # для первого
-        {"items": [{"id": "2", "name": "Job B"}]},      # для второго
-        {"items": []},                                   # для третьего — пустой список
+        {"items": [{"id": "1", "name": "Job A"}]},  # для первого
+        {"items": [{"id": "2", "name": "Job B"}]},  # для второго
+        {"items": []},  # для третьего — пустой список
     ]
 
     employers = [
@@ -84,7 +75,6 @@ def test_get_hh_data_multiple_employers(mock_connect):
     assert len(result) == 2  # из первых двух по 1 вакансии, третья — пустая
     assert result[0]["name"] == "Job A"
     assert result[1]["id"] == "2"
-
 
 
 @patch("src.hh_data.connect")
@@ -104,19 +94,10 @@ def test_filtered_hh_data_full_data():
         {
             "name": "Python Developer",
             "id": "123",
-            "salary": {
-                "from": 100000,
-                "to": 150000,
-                "currency": "RUB"
-            },
-            "snippet": {
-                "responsibility": "Разработка API"
-            },
-            "employer": {
-                "id": "1721725",
-                "name": "Rocket10"
-            },
-            "alternate_url": "https://hh.ru/vacancy/123"
+            "salary": {"from": 100000, "to": 150000, "currency": "RUB"},
+            "snippet": {"responsibility": "Разработка API"},
+            "employer": {"id": "1721725", "name": "Rocket10"},
+            "alternate_url": "https://hh.ru/vacancy/123",
         }
     ]
 
@@ -132,7 +113,6 @@ def test_filtered_hh_data_full_data():
     assert vacancy["employer"] == {"id": "1721725", "name": "Rocket10"}
 
 
-
 def test_filtered_hh_data_no_salary():
     """Тест: отсутствует поле salary → подставляется дефолтное значение."""
     input_vacancies = [
@@ -141,7 +121,7 @@ def test_filtered_hh_data_no_salary():
             "id": "456",
             "snippet": {"responsibility": "Тестирование"},
             "employer": {"id": "1579449", "name": "idaproject"},
-            "alternate_url": "https://hh.ru/vacancy/456"
+            "alternate_url": "https://hh.ru/vacancy/456",
         }
     ]
 
@@ -150,18 +130,12 @@ def test_filtered_hh_data_no_salary():
     assert len(result) == 1
     salary = result[0]["salary"]
     assert salary == {"from": "0", "to": "0", "currency": "None"}
-
 
 
 def test_filtered_hh_data_salary_not_dict():
     """Тест: salary есть, но не словарь → используется дефолтный salary."""
     input_vacancies = [
-        {
-            "name": "Designer",
-            "id": "789",
-            "salary": "not a dict",
-            "alternate_url": "https://hh.ru/vacancy/789"
-        }
+        {"name": "Designer", "id": "789", "salary": "not a dict", "alternate_url": "https://hh.ru/vacancy/789"}
     ]
 
     result = filtered_hh_data(input_vacancies)
@@ -169,7 +143,6 @@ def test_filtered_hh_data_salary_not_dict():
     assert len(result) == 1
     salary = result[0]["salary"]
     assert salary == {"from": "0", "to": "0", "currency": "None"}
-
 
 
 def test_filtered_hh_data_none_in_salary():
@@ -179,7 +152,7 @@ def test_filtered_hh_data_none_in_salary():
             "name": "Manager",
             "id": "101",
             "salary": {"from": None, "to": None, "currency": "USD"},
-            "alternate_url": "https://hh.ru/vacancy/101"
+            "alternate_url": "https://hh.ru/vacancy/101",
         }
     ]
 
@@ -190,7 +163,6 @@ def test_filtered_hh_data_none_in_salary():
     assert salary == {"from": "0", "to": "0", "currency": "USD"}
 
 
-
 def test_filtered_hh_data_no_snippet():
     """Тест: нет snippet/responsibility → description = 'Обязанности не указаны'."""
     input_vacancies = [
@@ -198,7 +170,7 @@ def test_filtered_hh_data_no_snippet():
             "name": "Analyst",
             "id": "202",
             "salary": {"from": 80000, "to": 120000, "currency": "RUB"},
-            "alternate_url": "https://hh.ru/vacancy/202"
+            "alternate_url": "https://hh.ru/vacancy/202",
         }
     ]
 
@@ -208,7 +180,6 @@ def test_filtered_hh_data_no_snippet():
     assert result[0]["description"] == "Обязанности не указаны"
 
 
-
 def test_filtered_hh_data_no_employer():
     """Тест: нет employer → employer = None."""
     input_vacancies = [
@@ -216,7 +187,7 @@ def test_filtered_hh_data_no_employer():
             "name": "Support",
             "id": "303",
             "salary": {"from": 40000, "to": 60000, "currency": "RUB"},
-            "alternate_url": "https://hh.ru/vacancy/303"
+            "alternate_url": "https://hh.ru/vacancy/303",
         }
     ]
 
@@ -224,18 +195,12 @@ def test_filtered_hh_data_no_employer():
 
     assert len(result) == 1
     assert result[0]["employer"] is None
-
 
 
 def test_filtered_hh_data_employer_not_dict():
     """Тест: employer есть, но не словарь → employer = None."""
     input_vacancies = [
-        {
-            "name": "HR",
-            "id": "404",
-            "employer": "not a dict",
-            "alternate_url": "https://hh.ru/vacancy/404"
-        }
+        {"name": "HR", "id": "404", "employer": "not a dict", "alternate_url": "https://hh.ru/vacancy/404"}
     ]
 
     result = filtered_hh_data(input_vacancies)
@@ -244,22 +209,14 @@ def test_filtered_hh_data_employer_not_dict():
     assert result[0]["employer"] is None
 
 
-
 def test_filtered_hh_data_no_url():
     """Тест: нет alternate_url → url = 'Нет ссылки'."""
-    input_vacancies = [
-        {
-            "name": "Writer",
-            "id": "505",
-            "salary": {"from": 30000, "to": 50000, "currency": "RUB"}
-        }
-    ]
+    input_vacancies = [{"name": "Writer", "id": "505", "salary": {"from": 30000, "to": 50000, "currency": "RUB"}}]
 
     result = filtered_hh_data(input_vacancies)
 
     assert len(result) == 1
     assert result[0]["url"] == "Нет ссылки"
-
 
 
 def test_filtered_hh_data_empty_list():
@@ -268,12 +225,11 @@ def test_filtered_hh_data_empty_list():
     assert result == []
 
 
-
 def test_filtered_hh_data_multiple_vacancies():
     """Тест: несколько вакансий в списке → все обрабатываются."""
     input_vacancies = [
         {"name": "Dev1", "id": "1"},
-        {"name": "Dev2", "id": "2", "salary": {"from": 90000, "currency": "RUB"}}
+        {"name": "Dev2", "id": "2", "salary": {"from": 90000, "currency": "RUB"}},
     ]
 
     result = filtered_hh_data(input_vacancies)
@@ -289,10 +245,7 @@ def test_filtered_hh_data_multiple_vacancies():
 
 def test_get_emp_vac_dict_normal_case():
     """Тест: корректные входные данные — оба списка не пустые."""
-    employers = [
-        {"id": "1721725", "name": "Rocket10"},
-        {"id": "1579449", "name": "idaproject"}
-    ]
+    employers = [{"id": "1721725", "name": "Rocket10"}, {"id": "1579449", "name": "idaproject"}]
     vacancies = [
         {
             "name": "Python Dev",
@@ -300,7 +253,7 @@ def test_get_emp_vac_dict_normal_case():
             "salary": {"from": "100000", "to": "0", "currency": "RUB"},
             "description": "Разработка API",
             "url": "https://example.com",
-            "employer": {"id": "1721725", "name": "Rocket10"}
+            "employer": {"id": "1721725", "name": "Rocket10"},
         }
     ]
 
@@ -313,7 +266,6 @@ def test_get_emp_vac_dict_normal_case():
     assert result["vacancies"] == vacancies
 
 
-
 def test_get_emp_vac_dict_empty_employers():
     """Тест: список работодателей пустой — сохраняется как пустой список."""
     employers = []
@@ -324,7 +276,7 @@ def test_get_emp_vac_dict_empty_employers():
             "salary": {"from": "50000", "to": "70000", "currency": "RUB"},
             "description": "Тестирование",
             "url": "https://example.com/qa",
-            "employer": None
+            "employer": None,
         }
     ]
 
@@ -335,12 +287,9 @@ def test_get_emp_vac_dict_empty_employers():
     assert result["vacancies"][0] == vacancies[0]
 
 
-
 def test_get_emp_vac_dict_empty_vacancies():
     """Тест: список вакансий пустой — сохраняется как пустой список."""
-    employers = [
-        {"id": "1721725", "name": "Rocket10"}
-    ]
+    employers = [{"id": "1721725", "name": "Rocket10"}]
     vacancies = []
 
     result = get_emp_vac_dict(employers, vacancies)
@@ -350,14 +299,12 @@ def test_get_emp_vac_dict_empty_vacancies():
     assert result["vacancies"] == []
 
 
-
 def test_get_emp_vac_dict_both_empty():
     """Тест: оба списка пустые — результат содержит пустые списки."""
     result = get_emp_vac_dict([], [])
 
     assert result["employers"] == []
     assert result["vacancies"] == []
-
 
 
 def test_get_emp_vac_dict_single_items():
@@ -388,10 +335,10 @@ def test_get_emp_vac_dict_no_modification():
     assert employers_orig == employers_copy
     assert vacancies_orig == vacancies_copy
 
-
     # Проверяем содержимое результата
     assert result["employers"] == employers_orig
     assert result["vacancies"] == vacancies_orig
+
 
 def test_get_emp_vac_dict_employer_none_in_vacancy():
     """Тест: вакансия с 'employer': None — сохраняется как есть."""
@@ -403,7 +350,7 @@ def test_get_emp_vac_dict_employer_none_in_vacancy():
             "salary": {"from": "0", "to": "0", "currency": None},
             "description": "Some duties",
             "url": "https://link",
-            "employer": None  # явно None
+            "employer": None,  # явно None
         }
     ]
 
