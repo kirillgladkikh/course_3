@@ -22,20 +22,20 @@ from typing import Any
 #     '1057',  # Лаборатория Касперского
 # ]
 
-# employers = [
-#     {"employer_id": "1721725", "name": "Rocket10"},
-#     {"employer_id": "1579449", "name": "idaproject"},
-#     # {"employer_id": "1740", "name": "Яндекс"},
-#     # {"employer_id": "67611", "name": "Тензор"},
-#     # {"employer_id": "4614421", "name": "RedLab"},
-#     # {"employer_id": "727029", "name": "PravoTech"},
-#     # {"employer_id": "2300703", "name": "Открытая мобильная платформа"},
-#     # {"employer_id": "819979", "name": "SkillStaff"},
-#     # {"employer_id": "1993194", "name": "YADRO"},
-#     # {"employer_id": "894410", "name": "РТЛабс"},
-#     # {"employer_id": "1473866", "name": "ООО Сбербанк-Сервис"},
-#     # {"employer_id": "1057", "name": "Лаборатория Касперского"}
-# ]
+employers = [
+    {"employer_id": "1721725", "name": "Rocket10"},
+    {"employer_id": "1579449", "name": "idaproject"},
+    # {"employer_id": "1740", "name": "Яндекс"},
+    # {"employer_id": "67611", "name": "Тензор"},
+    # {"employer_id": "4614421", "name": "RedLab"},
+    # {"employer_id": "727029", "name": "PravoTech"},
+    # {"employer_id": "2300703", "name": "Открытая мобильная платформа"},
+    # {"employer_id": "819979", "name": "SkillStaff"},
+    # {"employer_id": "1993194", "name": "YADRO"},
+    # {"employer_id": "894410", "name": "РТЛабс"},
+    # {"employer_id": "1473866", "name": "ООО Сбербанк-Сервис"},
+    # {"employer_id": "1057", "name": "Лаборатория Касперского"}
+]
 
 
 def get_hh_data(employers: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -133,14 +133,14 @@ def filtered_hh_data(all_vacancies: list[dict[str, Any]]) -> list[dict[str, Any]
     return vacancies
 
 
-def get_emp_vac_dict(employers: list[dict[str, Any]], filtered_hh_data: list[dict[str, Any]]) -> dict[str, Any]:
+def get_emp_vac_dict(employers: list[dict[str, Any]], filtered_hh_data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """ """
     result = {
         "employers": employers,
         "vacancies": filtered_hh_data
     }
-    print(f'\nemp_vac_dict: {result}')
-    return result
+    print(f'\nemp_vac_dict: {[result]}')
+    return [result]  # Обернули словарь в список
     # emp_vac_dict = []
     # emp_vac_dict['employers'] = employers
     # emp_vac_dict.append['vacancies'] = filtered_hh_data
