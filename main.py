@@ -1,6 +1,7 @@
 
 from config import config
-from src.utils_course_3 import get_hh_data, create_database, save_data_to_database
+from src.hh_data import get_hh_data, filtered_hh_data
+from src.db_create import create_database, save_data_to_database
 
 
 def main():
@@ -21,8 +22,8 @@ def main():
 
     params = config()
 
-    data = get_hh_data(employers_ids)
-    # create_database('course3', params)
+    data = filtered_hh_data(get_hh_data(employers_ids))
+    create_database('course3', params)
     # save_data_to_database(data, 'course3', params)
 
 

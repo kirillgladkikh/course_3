@@ -67,6 +67,13 @@ def filtered_hh_data(all_vacancies: list[dict[str, Any]]) -> list[dict[str, Any]
                     "to": salary.get("to"),
                     "currency": salary.get("currency"),
                 }
+            # Сценарий 3: salary ОТСУТСТВУЕТ в вакансии
+            else:
+                salary_info = {
+                    "from": "0",
+                    "to": "0",
+                    "currency": None
+                }
 
         # 3. Проверка поля "employer"
         employer_info = None
@@ -86,7 +93,7 @@ def filtered_hh_data(all_vacancies: list[dict[str, Any]]) -> list[dict[str, Any]
             {
                 "name": vacancy["name"],
                 "id": vacancy["id"],
-                "salary": salary_info,  # vacancy["salary"],
+                "salary": salary_info,
                 "description": responsibility or "Обязанности не указаны",
                 "url": vacancy.get("alternate_url", "Нет ссылки"),  # Проверяем наличие "alternate_url"
                 "employer": employer_info,
@@ -99,6 +106,22 @@ def filtered_hh_data(all_vacancies: list[dict[str, Any]]) -> list[dict[str, Any]
 def validate_hh_data(filtered_hh_data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """ """
     pass
+    # if salary is None:
+    #     self.salary_from = "0"
+    #     self.salary_to = "0"
+    #     self.salary_currency = None
+    # elif isinstance(salary, dict):
+    #
+    #     from_value = salary.get("from")
+    #     self.salary_from = 0 if from_value is None else from_value
+    #
+    #     to_value = salary.get("to")
+    #     self.salary_to = 0 if to_value is None else to_value
+    #
+    #     self.salary_currency = salary.get("currency")
+    #
+    # else:
+    #     raise TypeError(f"salary должен быть dict или None, получено: {type(salary).__name__}")
 
 
 
