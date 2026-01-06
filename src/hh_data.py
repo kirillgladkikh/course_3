@@ -43,10 +43,26 @@ def get_hh_data(employers: list[dict[str]]) -> list[dict[str, Any]]:
     hh_data = []
     for employer in employers:
         emp_id = employer["employer_id"]  # берём ID из словаря
-        response = connect(emp_id)
-        # print(f'\nresponse["items"]: {response["items"]}')
-        hh_data.extend(response["items"])
-    # print(f'\nhh_data.extend(response["items"]: {hh_data}')
+
+        try:
+            response = connect(emp_id)  # предполагаем, что connect() возвращает JSON-ответ API
+            # print(f'\nresponse["items"]: {response["items"]}')
+
+            # Проверяем наличие ключа "items" и что это список
+            if "items" in response and isinstance(response["items"], list):
+                hh_data.extend(response["items"])
+                # print(f'\nhh_data.extend(response["items"]: {hh_data}')
+            else:
+                print(f"Предупреждение: в ответе для employer_id={emp_id} нет списка 'items'")
+
+        except Exception as e:
+            print(f"Ошибка при получении данных для employer_id={emp_id} ({employer['name']}): {e}")
+
+
+    #     response = connect(emp_id)
+    #     # print(f'\nresponse["items"]: {response["items"]}')
+    #     hh_data.extend(response["items"])
+    # # print(f'\nhh_data.extend(response["items"]: {hh_data}')
     return hh_data
 
 def connect(employer_id: str = '1740'):
