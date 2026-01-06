@@ -7,25 +7,42 @@ from typing import Any
 # забираем с сайта все его вакансии
 # кладем все вакансии в
 
-employers_ids = [
-    '1721725', # Rocket10
-    '1579449',  # idaproject
-    # '1740',  # Яндекс
-    # '67611',  # Тензор
-    # '4614421',  # RedLab
-    # '727029',  # PravoTech
-    # '2300703',  # Открытая мобильная платформа
-    # '819979',  # SkillStaff
-    # '1993194',  # YADRO
-    # '894410',  # РТЛабс
-    # '1473866',  # ООО Сбербанк-Сервис
-    # '1057',  # Лаборатория Касперского
+# employers_ids = [
+#     '1721725', # Rocket10
+#     '1579449',  # idaproject
+#     '1740',  # Яндекс
+#     '67611',  # Тензор
+#     '4614421',  # RedLab
+#     '727029',  # PravoTech
+#     '2300703',  # Открытая мобильная платформа
+#     '819979',  # SkillStaff
+#     '1993194',  # YADRO
+#     '894410',  # РТЛабс
+#     '1473866',  # ООО Сбербанк-Сервис
+#     '1057',  # Лаборатория Касперского
+# ]
+
+employers = [
+    {"employer_id": "1721725", "name": "Rocket10"},
+    {"employer_id": "1579449", "name": "idaproject"},
+    # {"employer_id": "1740", "name": "Яндекс"},
+    # {"employer_id": "67611", "name": "Тензор"},
+    # {"employer_id": "4614421", "name": "RedLab"},
+    # {"employer_id": "727029", "name": "PravoTech"},
+    # {"employer_id": "2300703", "name": "Открытая мобильная платформа"},
+    # {"employer_id": "819979", "name": "SkillStaff"},
+    # {"employer_id": "1993194", "name": "YADRO"},
+    # {"employer_id": "894410", "name": "РТЛабс"},
+    # {"employer_id": "1473866", "name": "ООО Сбербанк-Сервис"},
+    # {"employer_id": "1057", "name": "Лаборатория Касперского"}
 ]
 
-def get_hh_data(employers_ids: list[str]) -> list[dict[str, Any]]:
+
+def get_hh_data(employers: list[dict[str]]) -> list[dict[str, Any]]:
     """ """
     hh_data = []
-    for emp_id in employers_ids:
+    for employer in employers:
+        emp_id = employer["employer_id"]  # берём ID из словаря
         response = connect(emp_id)
         # print(f'\nresponse["items"]: {response["items"]}')
         hh_data.extend(response["items"])
@@ -103,30 +120,39 @@ def filtered_hh_data(all_vacancies: list[dict[str, Any]]) -> list[dict[str, Any]
     return vacancies
 
 
-def validate_hh_data(filtered_hh_data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+# def employer_hh_data(all_vacancies: list[dict[str, Any]]) -> list[dict[str, Any]]:
+#     """ """
+#     vacancies = []
+#     for vacancy in all_vacancies:
+#         # 3. Проверка поля "employer"
+#         employer_info = None
+#
+#         # Сценарий 1: employer присутствует в вакансии
+#         if "employer" in vacancy:
+#             employer = vacancy["employer"]
+#
+#             # Сценарий 2: employer — словарь (корректный формат)
+#             if isinstance(employer, dict):
+#                 employer_info = {
+#                     "id": employer.get("id"),
+#                     "name": employer.get("name"),
+#                 }
+#
+#         vacancies.append(
+#             {
+#                 "employer": employer_info,
+#             }
+#         )
+#     print(f'\nFiltered vacancies: {vacancies}')
+#     return vacancies
+
+
+def get_emp_vac_dict(all_vacancies: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """ """
     pass
-    # if salary is None:
-    #     self.salary_from = "0"
-    #     self.salary_to = "0"
-    #     self.salary_currency = None
-    # elif isinstance(salary, dict):
-    #
-    #     from_value = salary.get("from")
-    #     self.salary_from = 0 if from_value is None else from_value
-    #
-    #     to_value = salary.get("to")
-    #     self.salary_to = 0 if to_value is None else to_value
-    #
-    #     self.salary_currency = salary.get("currency")
-    #
-    # else:
-    #     raise TypeError(f"salary должен быть dict или None, получено: {type(salary).__name__}")
-
-
 
 if __name__ == '__main__':
-    data = get_hh_data(employers_ids)
+    data = get_hh_data(employers)
     filtered_data = filtered_hh_data(data)
     # response = connect()
     # print(f'\nresponse["items"]: {response["items"]}')
